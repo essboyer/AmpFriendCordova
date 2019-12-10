@@ -14,7 +14,7 @@
         <link href="css/mdb.min.css" rel="stylesheet">
         <!-- Your custom styles (optional) -->
         <link href="css/style.css" rel="stylesheet">
-        <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+        <link href="css/bootstrap-toggle.min.css" rel="stylesheet">
 
         <style>
             .toggle-on.btn, .toggle-off.btn {font-size: 1.6rem;}
@@ -30,7 +30,8 @@
             <div class="container-fluid" style="background: #252525;">
                 <div class="row">
                     <div class="col-xs-12">
-                        vRMS<input type="text" class="calculator-input z-depth-1" value disabled>
+                        <div class="calculator-input-text">vRMS</div>
+                        <input type="text" class="calculator-input z-depth-1" value disabled>
                     </div>
                 </div>
                 <div class="row calculator-display">
@@ -80,6 +81,7 @@
 
                 <button type="button" value="0" class="btn btn-light waves-effect">0</button>
                 <button type="button" class="decimal function btn btn-secondary" value=".">.</button>
+                <button type="button" class="delete function btn btn-danger btn-sm" value="delete">DEL</button>
                 <button type="button" class="all-clear function btn btn-danger btn-sm" value="all-clear">AC</button>
 
             </div>
@@ -125,7 +127,7 @@
                 }
             }
 
-            function handleOperator() {
+            function handleCalculation() {
                 const {
                     displayValue,
                 } = calculator;
@@ -135,48 +137,41 @@
                 if ($('#toggle-power').prop('checked')) {
                     // RMS2P
                     if ($('#toggle-rms').prop('checked')) {
-                        $('.2ohms').text(findPFromRMS(inputValue, 2));
-                        $('.4ohms').text(findPFromRMS(inputValue, 4));
-                        $('.8ohms').text(findPFromRMS(inputValue, 8));
-                        $('.16ohms').text(findPFromRMS(inputValue, 16));
+                        $('.2ohms').text(findPFromRMS(inputValue, 2).toFixed(1) + " w");
+                        $('.4ohms').text(findPFromRMS(inputValue, 4).toFixed(1) + " w");
+                        $('.8ohms').text(findPFromRMS(inputValue, 8).toFixed(1) + " w");
+                        $('.16ohms').text(findPFromRMS(inputValue, 16).toFixed(1) + " w");
 
                         //PP2P
                     } else {
-                        $('.2ohms').text(findPFromPeak(inputValue, 2));
-                        $('.4ohms').text(findPFromPeak(inputValue, 4));
-                        $('.8ohms').text(findPFromPeak(inputValue, 8));
-                        $('.16ohms').text(findPFromPeak(inputValue, 16));
+                        $('.2ohms').text(findPFromPeak(inputValue, 2).toFixed(1) + " w");
+                        $('.4ohms').text(findPFromPeak(inputValue, 4).toFixed(1) + " w");
+                        $('.8ohms').text(findPFromPeak(inputValue, 8).toFixed(1) + " w");
+                        $('.16ohms').text(findPFromPeak(inputValue, 16).toFixed(1) + " w");
                     }
 
                     // If we're converting from P as input
                 } else {
+                    if ($('#toggle-rms').prop('checked')) {
+                        $('.2ohms').text(findRMSFromP(inputValue, 2).toFixed(1) + " v");
+                        $('.4ohms').text(findRMSFromP(inputValue, 4).toFixed(1) + " v");
+                        $('.8ohms').text(findRMSFromP(inputValue, 8).toFixed(1) + " v");
+                        $('.16ohms').text(findRMSFromP(inputValue, 16).toFixed(1) + " v");
 
+                        //PP2P
+                    } else {
+                        $('.2ohms').text(findPeakFromP(inputValue, 2).toFixed(1) + " v");
+                        $('.4ohms').text(findPeakFromP(inputValue, 4).toFixed(1) + " v");
+                        $('.8ohms').text(findPeakFromP(inputValue, 8).toFixed(1) + " v");
+                        $('.16ohms').text(findPeakFromP(inputValue, 16).toFixed(1) + " v");
+                    }
                 }
-
-                //const result = performCalculation[operator](currentValue, inputValue);
-                //const result = 
-                //calculator.displayValue = String(result) + "W";
-//                    calculator.firstOperand = result;
 
             }
 
-//            const performCalculation = {
-//                'rms2p': (firstOperand, secondOperand) => firstOperand / secondOperand,
-//
-//                'pp2p': (firstOperand, secondOperand) => firstOperand * secondOperand,
-//
-//                'p2rms': (firstOperand, secondOperand) => firstOperand + secondOperand,
-//
-//                'p2pp': (firstOperand, secondOperand) => firstOperand - secondOperand,
-//
-//            };
-
             function resetCalculator() {
                 calculator.displayValue = '0';
-                $('.2ohms').text("");
-                $('.4ohms').text("");
-                $('.8ohms').text("");
-                $('.16ohms').text("");
+                $('.2ohms,.4ohms,.8ohms,.16ohms').text("");
             }
 
             function updateDisplay() {
@@ -206,9 +201,22 @@
                     updateDisplay();
                     return;
                 }
+                
+                if (target.classList.contains('delete')) {
+                    var l = calculator.displayValue.length;
+                    if (l-1 === 0 ) {
+                        calculator.displayValue = 0;
+                    } else {
+                        calculator.displayValue = calculator.displayValue.substr(0, l - 1);
+                    }
+                    
+                    handleCalculation();
+                    updateDisplay();
+                    return;
+                }
 
                 inputDigit(target.value);
-                handleOperator();
+                handleCalculation();
                 updateDisplay();
             });
 
@@ -217,22 +225,22 @@
                     on: 'RMS',
                     off: 'Peak'
                 }).change(function () {
-                    handleOperator();
+                    handleCalculation();
                 });
                 
                 $('#toggle-power').bootstrapToggle({
                     on: 'Volts',
                     off: 'Watts'
                 }).change(function () {
-                    //Disable the RMS toggle if Power is selected
-                    $('#toggle-rms').bootstrapToggle($('#toggle-power').prop('checked') ? 'enable' : 'disable');
-                    handleOperator();
+                    //Change the text in the input display
+                    $('.calculator-input-text').text($('#toggle-power').prop('checked') ? 'vRMS' : 'Watts');
+                    handleCalculation();
                 });
 
             })
         </script>
         <script src="js/maths.js"></script>
-        <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+        <script src="js/bootstrap-toggle.min.js"></script>
 
     </body>
 
