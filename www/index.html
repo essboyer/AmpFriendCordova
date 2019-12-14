@@ -204,8 +204,8 @@
                 
                 if (target.classList.contains('delete')) {
                     var l = calculator.displayValue.length;
-                    if (l-1 === 0 ) {
-                        calculator.displayValue = 0;
+                    if (l - 1 <= 0 || calculator.displayValue === '0') {
+                        resetCalculator();
                     } else {
                         calculator.displayValue = calculator.displayValue.substr(0, l - 1);
                     }

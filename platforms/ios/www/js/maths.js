@@ -11,7 +11,12 @@ function findPFromPeak(peakVolts, load)
 
 function findRMSFromP(p, load)
 {
-    return Math.round(Math.sqrt(p * load));
+    return Math.round(Math.sqrt(p * load) * 100) /100;
+}
+
+function findPeakFromP(p, load)
+{
+    return rms2Peak(findRMSFromP(p, load));
 }
 
 function peak2RMS(peakVolts)
