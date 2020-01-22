@@ -208,10 +208,15 @@
                 
                 if (target.classList.contains('delete')) {
                     var l = calculator.displayValue.length;
+<<<<<<< HEAD
                     if (l-1 === 0 ) {
                         calculator.displayValue = 0;
                         resetCalculator();
                         updateDisplay();
+=======
+                    if (l - 1 <= 0 || calculator.displayValue === '0') {
+                        resetCalculator();
+>>>>>>> 1f9d78bf9f3763bfe22315206e26793c46b95e14
                     } else {
                         calculator.displayValue = calculator.displayValue.substr(0, l - 1);
                     }
