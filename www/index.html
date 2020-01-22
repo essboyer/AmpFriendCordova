@@ -132,6 +132,10 @@
                     displayValue,
                 } = calculator;
                 const inputValue = parseFloat(displayValue);
+                
+                if (inputValue == 0) {
+                    return;
+                }
 
                 // If we're converting V to P
                 if ($('#toggle-power').prop('checked')) {
@@ -206,6 +210,8 @@
                     var l = calculator.displayValue.length;
                     if (l-1 === 0 ) {
                         calculator.displayValue = 0;
+                        resetCalculator();
+                        updateDisplay();
                     } else {
                         calculator.displayValue = calculator.displayValue.substr(0, l - 1);
                     }
